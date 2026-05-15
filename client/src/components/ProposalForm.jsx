@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { validateProposalForm } from '../utils/inputValidation'
 
 function ProposalForm({ onSubmit, loading }) {
   const [formData, setFormData] = useState({
@@ -15,50 +16,9 @@ function ProposalForm({ onSubmit, loading }) {
   const [errors, setErrors] = useState({})
 
   const validateForm = () => {
-    const newErrors = {}
-
-    // Client Name validation (required, min 2 chars)
-    if (!formData.clientName.trim()) {
-      newErrors.clientName = 'Client name is required'
-    } else if (formData.clientName.trim().length < 2) {
-      newErrors.clientName = 'Client name must be at least 2 characters'
-    }
-
-    // Company Name validation (required, min 2 chars)
-    if (!formData.companyName.trim()) {
-      newErrors.companyName = 'Company name is required'
-    } else if (formData.companyName.trim().length < 2) {
-      newErrors.companyName = 'Company name must be at least 2 characters'
-    }
-
-    // Project Title validation (required, min 2 chars)
-    if (!formData.projectTitle.trim()) {
-      newErrors.projectTitle = 'Project title is required'
-    } else if (formData.projectTitle.trim().length < 2) {
-      newErrors.projectTitle = 'Project title must be at least 2 characters'
-    }
-
-    // Project Description validation (required, min 50 characters)
-    if (!formData.projectDescription.trim()) {
-      newErrors.projectDescription = 'Project description is required'
-    } else if (formData.projectDescription.trim().length < 50) {
-      newErrors.projectDescription = 'Description must be at least 50 characters'
-    }
-
-    // Required Features validation (required, min 10 characters)
-    if (!formData.requiredFeatures.trim()) {
-      newErrors.requiredFeatures = 'Required features are required'
-    } else if (formData.requiredFeatures.trim().length < 10) {
-      newErrors.requiredFeatures = 'Features must be at least 10 characters'
-    }
-
-    // Platform Type validation (must be selected)
-    if (!formData.platformType) {
-      newErrors.platformType = 'Platform type is required'
-    }
-
+    const { valid, errors: newErrors } = validateProposalForm(formData)
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    return valid
   }
 
   const handleChange = (e) => {
@@ -210,8 +170,11 @@ function ProposalForm({ onSubmit, loading }) {
             value={formData.budgetRange}
             onChange={handleChange}
             placeholder="e.g., $5,000 - $10,000"
-            className="w-full px-4 py-2 border border-white/10 bg-white/5 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
+            className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition ${
+              errors.budgetRange ? 'border-red-500/50 bg-red-500/10' : 'border-white/10 bg-white/5 text-white'
+            }`}
           />
+          {errors.budgetRange && <p className="mt-1 text-sm text-red-400">{errors.budgetRange}</p>}
         </div>
 
         {/* Timeline */}
@@ -226,8 +189,11 @@ function ProposalForm({ onSubmit, loading }) {
             value={formData.timeline}
             onChange={handleChange}
             placeholder="e.g., 3 months"
-            className="w-full px-4 py-2 border border-white/10 bg-white/5 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition"
+            className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition ${
+              errors.timeline ? 'border-red-500/50 bg-red-500/10' : 'border-white/10 bg-white/5 text-white'
+            }`}
           />
+          {errors.timeline && <p className="mt-1 text-sm text-red-400">{errors.timeline}</p>}
         </div>
       </div>
 
