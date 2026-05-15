@@ -2,40 +2,28 @@ import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import ForgotPassword from './pages/ForgotPassword'
 import Dashboard from './pages/Dashboard'
+import { isAuthenticated } from './utils/auth'
 import './index.css'
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authenticated, setAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('authToken')
-    if (token) {
-      setIsAuthenticated(true)
-    }
+    const checkAuth = () => setAuthenticated(isAuthenticated())
+    checkAuth()
     setLoading(false)
-  }, [])
 
-  useEffect(() => {
-    // Listen for storage changes (for when login/signup updates localStorage)
-    const handleStorageChange = () => {
-      const token = localStorage.getItem('authToken')
-      setIsAuthenticated(!!token)
-    }
-    
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    window.addEventListener('auth-change', checkAuth)
+    return () => window.removeEventListener('auth-change', checkAuth)
   }, [])
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-purple-900 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
-          <p className="text-cyan-400 font-semibold">Loading...</p>
-        </div>
+        <div className="w-12 h-12 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
       </div>
     )
   }
@@ -43,10 +31,26 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-        <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
-        <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
+        <Route
+          path="/login"
+          element={authenticated ? <Navigate to="/" replace /> : <Login />}
+        />
+        <Route
+          path="/signup"
+          element={authenticated ? <Navigate to="/" replace /> : <Signup />}
+        />
+        <Route
+          path="/forgot-password"
+          element={authenticated ? <Navigate to="/" replace /> : <ForgotPassword />}
+        />
+        <Route
+          path="/"
+          element={authenticated ? <Dashboard /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="*"
+          element={<Navigate to={authenticated ? '/' : '/login'} replace />}
+        />
       </Routes>
     </Router>
   )

@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { registerUser } from '../utils/auth'
+import PasswordInput from '../components/PasswordInput'
 
 function Signup() {
   const [fullName, setFullName] = useState('')
@@ -37,12 +39,10 @@ function Signup() {
 
     setLoading(true)
     try {
-      // TODO: Replace with actual API call
-      localStorage.setItem('user', JSON.stringify({ fullName, email, id: Date.now() }))
-      localStorage.setItem('authToken', 'token_' + Date.now())
-      navigate('/')
+      registerUser({ fullName, email, password })
+      navigate('/', { replace: true })
     } catch (err) {
-      setError('Signup failed. Please try again.')
+      setError(err.message || 'Signup failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -123,37 +123,25 @@ function Signup() {
 
             {/* Password Input */}
             <div className="relative group">
-              <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all duration-300 group-hover:border-white/20"
-                />
-                <svg className="absolute right-3 top-3.5 w-5 h-5 text-gray-500 group-hover:text-cyan-400 transition" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
-                </svg>
-              </div>
+              <label htmlFor="signup-password" className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+              <PasswordInput
+                id="signup-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                minLength={6}
+              />
               <p className="text-xs text-gray-500 mt-1">At least 6 characters</p>
             </div>
 
             {/* Confirm Password Input */}
             <div className="relative group">
-              <label className="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all duration-300 group-hover:border-white/20"
-                />
-                <svg className="absolute right-3 top-3.5 w-5 h-5 text-gray-500 group-hover:text-cyan-400 transition" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
-                </svg>
-              </div>
+              <label htmlFor="signup-confirm-password" className="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+              <PasswordInput
+                id="signup-confirm-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                minLength={6}
+              />
             </div>
 
             {/* Terms & Conditions */}
@@ -194,32 +182,6 @@ function Signup() {
               )}
             </button>
           </form>
-
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-4">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-            <span className="text-xs text-gray-500 uppercase">or</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-          </div>
-
-          {/* Social Signup */}
-          <div className="flex gap-3">
-            <button className="flex-1 py-2 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 text-sm font-medium transition-all duration-300">
-              <svg className="w-5 h-5 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 0C4.477 0 0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.879V12.89h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.989C16.343 19.129 20 14.99 20 10c0-5.523-4.477-10-10-10z"/>
-              </svg>
-            </button>
-            <button className="flex-1 py-2 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 text-sm font-medium transition-all duration-300">
-              <svg className="w-5 h-5 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.449-.901 4.711-2.354 6.437.955.504 2.052.786 3.182.786 4.57 0 8.26-3.467 8.26-7.743 0-.928-.153-1.82-.447-2.67.537.030 1.071.027 1.602.027C23.993 3.85 24 3.05 24 3.05c0-2.597-2.191-4.7-4.894-4.7-2.703 0-4.894 2.103-4.894 4.7.163-.163.329-.315.497-.458z"/>
-              </svg>
-            </button>
-            <button className="flex-1 py-2 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-gray-300 text-sm font-medium transition-all duration-300">
-              <svg className="w-5 h-5 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 0a10 10 0 1 1 0 20 10 10 0 0 1 0-20z"/>
-              </svg>
-            </button>
-          </div>
 
           {/* Sign In Link */}
           <p className="text-center mt-6 text-gray-400">

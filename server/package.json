@@ -9,10 +9,12 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "@anthropic-ai/sdk": "^0.24.3",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "@anthropic-ai/sdk": "^0.24.3"
+    "express": "^4.19.2",
+    "nodemailer": "^8.0.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
