@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { registerUser } from '../utils/auth'
-import { validateEmail } from '../utils/emailValidation'
+import { validateEmailForSignup } from '../utils/emailValidation'
 import { validateFullName } from '../utils/nameValidation'
 import PasswordInput from '../components/PasswordInput'
 
@@ -30,7 +30,7 @@ function Signup() {
       return
     }
 
-    const emailCheck = validateEmail(email)
+    const emailCheck = validateEmailForSignup(email, fullName)
     if (!emailCheck.valid) {
       setError(emailCheck.message)
       return

@@ -1,4 +1,4 @@
-import { validateEmail, isValidEmail } from './emailValidation.js'
+import { validateEmail, validateEmailForSignup, isValidEmail } from './emailValidation.js'
 import { validateFullName } from './nameValidation.js'
 
 export { isValidEmail }
@@ -51,7 +51,7 @@ export const registerUser = ({ fullName, email, password }) => {
 
   const trimmedEmail = (email || '').trim()
 
-  const emailCheck = validateEmail(trimmedEmail)
+  const emailCheck = validateEmailForSignup(trimmedEmail, fullName)
   if (!emailCheck.valid) {
     throw new Error(emailCheck.message)
   }
