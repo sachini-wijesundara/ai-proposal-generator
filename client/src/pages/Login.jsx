@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
-import { isValidEmail, loginUser } from '../utils/auth'
+import { loginUser } from '../utils/auth'
+import { validateEmail } from '../utils/emailValidation'
 import PasswordInput from '../components/PasswordInput'
 
 function Login() {
@@ -22,8 +23,9 @@ function Login() {
         setError('Email is required')
         return
       }
-      if (!isValidEmail(email)) {
-        setError('Please enter a valid email address (e.g. name@example.com)')
+      const emailCheck = validateEmail(email)
+      if (!emailCheck.valid) {
+        setError(emailCheck.message)
         return
       }
       if (password.length < 6) {

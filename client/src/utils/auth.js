@@ -1,10 +1,6 @@
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+import { validateEmail, isValidEmail } from './emailValidation.js'
 
-export const isValidEmail = (email) => {
-  const trimmed = (email || '').trim()
-  if (!trimmed || trimmed.length > 254) return false
-  return EMAIL_REGEX.test(trimmed)
-}
+export { isValidEmail }
 
 const USERS_KEY = 'registeredUsers'
 const SESSION_USER_KEY = 'user'
@@ -49,8 +45,9 @@ export const clearSession = () => {
 export const registerUser = ({ fullName, email, password }) => {
   const trimmedEmail = (email || '').trim()
 
-  if (!isValidEmail(trimmedEmail)) {
-    throw new Error('Please enter a valid email address (e.g. name@example.com)')
+  const emailCheck = validateEmail(trimmedEmail)
+  if (!emailCheck.valid) {
+    throw new Error(emailCheck.message)
   }
 
   const normalizedEmail = trimmedEmail.toLowerCase()
@@ -77,8 +74,9 @@ export const registerUser = ({ fullName, email, password }) => {
 export const loginUser = ({ email, password }) => {
   const trimmedEmail = (email || '').trim()
 
-  if (!isValidEmail(trimmedEmail)) {
-    throw new Error('Please enter a valid email address')
+  const emailCheck = validateEmail(trimmedEmail)
+  if (!emailCheck.valid) {
+    throw new Error(emailCheck.message)
   }
 
   const normalizedEmail = trimmedEmail.toLowerCase()
@@ -101,8 +99,9 @@ export const loginUser = ({ email, password }) => {
 export const resetPassword = ({ email, newPassword }) => {
   const trimmedEmail = (email || '').trim()
 
-  if (!isValidEmail(trimmedEmail)) {
-    throw new Error('Please enter a valid email address')
+  const emailCheck = validateEmail(trimmedEmail)
+  if (!emailCheck.valid) {
+    throw new Error(emailCheck.message)
   }
 
   const normalizedEmail = trimmedEmail.toLowerCase()
