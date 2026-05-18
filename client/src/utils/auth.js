@@ -1,4 +1,5 @@
 import { validateEmail, isValidEmail } from './emailValidation.js'
+import { validateFullName } from './nameValidation.js'
 
 export { isValidEmail }
 
@@ -43,6 +44,11 @@ export const clearSession = () => {
 }
 
 export const registerUser = ({ fullName, email, password }) => {
+  const nameCheck = validateFullName(fullName)
+  if (!nameCheck.valid) {
+    throw new Error(nameCheck.message)
+  }
+
   const trimmedEmail = (email || '').trim()
 
   const emailCheck = validateEmail(trimmedEmail)
@@ -59,7 +65,7 @@ export const registerUser = ({ fullName, email, password }) => {
 
   const newUser = {
     id: Date.now(),
-    fullName: fullName.trim(),
+    fullName: fullName.trim().replace(/\s+/g, ' '),
     email: normalizedEmail,
     password,
   }

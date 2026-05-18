@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { registerUser } from '../utils/auth'
 import { validateEmail } from '../utils/emailValidation'
+import { validateFullName } from '../utils/nameValidation'
 import PasswordInput from '../components/PasswordInput'
 
 function Signup() {
@@ -23,8 +24,9 @@ function Signup() {
       return
     }
 
-    if (fullName.trim().length < 2) {
-      setError('Full name must be at least 2 characters')
+    const nameCheck = validateFullName(fullName)
+    if (!nameCheck.valid) {
+      setError(nameCheck.message)
       return
     }
 
