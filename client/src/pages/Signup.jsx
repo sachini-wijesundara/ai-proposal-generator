@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { registerUser } from '../utils/auth'
+import { isValidEmail, registerUser } from '../utils/auth'
 import PasswordInput from '../components/PasswordInput'
 
 function Signup() {
@@ -17,8 +17,18 @@ function Signup() {
     e.preventDefault()
     setError('')
 
-    if (!fullName || !email || !password || !confirmPassword) {
+    if (!fullName.trim() || !email.trim() || !password || !confirmPassword) {
       setError('Please fill in all fields')
+      return
+    }
+
+    if (fullName.trim().length < 2) {
+      setError('Full name must be at least 2 characters')
+      return
+    }
+
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address (e.g. name@example.com)')
       return
     }
 
@@ -40,7 +50,10 @@ function Signup() {
     setLoading(true)
     try {
       registerUser({ fullName, email, password })
-      navigate('/', { replace: true })
+      navigate('/login', {
+        replace: true,
+        state: { message: 'Account created successfully! Please sign in with your email and password.' },
+      })
     } catch (err) {
       setError(err.message || 'Signup failed. Please try again.')
     } finally {
@@ -112,6 +125,8 @@ function Signup() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
+                  autoComplete="email"
+                  required
                   className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500/50 focus:bg-white/10 transition-all duration-300 group-hover:border-white/20"
                 />
                 <svg className="absolute right-3 top-3.5 w-5 h-5 text-gray-500 group-hover:text-cyan-400 transition" fill="currentColor" viewBox="0 0 20 20">

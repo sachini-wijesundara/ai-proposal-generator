@@ -1,3 +1,11 @@
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+export const isValidEmail = (email) => {
+  const trimmed = (email || '').trim()
+  if (!trimmed || trimmed.length > 254) return false
+  return EMAIL_REGEX.test(trimmed)
+}
+
 const USERS_KEY = 'registeredUsers'
 const SESSION_USER_KEY = 'user'
 const SESSION_TOKEN_KEY = 'authToken'
@@ -39,7 +47,13 @@ export const clearSession = () => {
 }
 
 export const registerUser = ({ fullName, email, password }) => {
-  const normalizedEmail = email.trim().toLowerCase()
+  const trimmedEmail = (email || '').trim()
+
+  if (!isValidEmail(trimmedEmail)) {
+    throw new Error('Please enter a valid email address (e.g. name@example.com)')
+  }
+
+  const normalizedEmail = trimmedEmail.toLowerCase()
   const users = getUsers()
 
   if (users.some((u) => u.email === normalizedEmail)) {
@@ -57,12 +71,17 @@ export const registerUser = ({ fullName, email, password }) => {
   saveUsers(users)
 
   const { password: _, ...safeUser } = newUser
-  setSession(safeUser)
   return safeUser
 }
 
 export const loginUser = ({ email, password }) => {
-  const normalizedEmail = email.trim().toLowerCase()
+  const trimmedEmail = (email || '').trim()
+
+  if (!isValidEmail(trimmedEmail)) {
+    throw new Error('Please enter a valid email address')
+  }
+
+  const normalizedEmail = trimmedEmail.toLowerCase()
   const users = getUsers()
   const user = users.find((u) => u.email === normalizedEmail)
 
@@ -80,7 +99,13 @@ export const loginUser = ({ email, password }) => {
 }
 
 export const resetPassword = ({ email, newPassword }) => {
-  const normalizedEmail = email.trim().toLowerCase()
+  const trimmedEmail = (email || '').trim()
+
+  if (!isValidEmail(trimmedEmail)) {
+    throw new Error('Please enter a valid email address')
+  }
+
+  const normalizedEmail = trimmedEmail.toLowerCase()
   const users = getUsers()
   const userIndex = users.findIndex((u) => u.email === normalizedEmail)
 

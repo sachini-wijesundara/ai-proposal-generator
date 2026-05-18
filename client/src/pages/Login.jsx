@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { loginUser } from '../utils/auth'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
+import { isValidEmail, loginUser } from '../utils/auth'
 import PasswordInput from '../components/PasswordInput'
 
 function Login() {
@@ -9,6 +9,8 @@ function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const successMessage = location.state?.message
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -18,6 +20,10 @@ function Login() {
     try {
       if (!email.trim()) {
         setError('Email is required')
+        return
+      }
+      if (!isValidEmail(email)) {
+        setError('Please enter a valid email address (e.g. name@example.com)')
         return
       }
       if (password.length < 6) {
@@ -60,6 +66,15 @@ function Login() {
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
           <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
           <p className="text-gray-400 text-sm mb-8">Sign in to your account to continue</p>
+
+          {successMessage && (
+            <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg text-green-300 text-sm flex items-center gap-2">
+              <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              {successMessage}
+            </div>
+          )}
 
           {error && (
             <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm flex items-center gap-2">
