@@ -81,7 +81,38 @@ export function validateField(fieldName, value, { required = false, minLength = 
     return 'Contains invalid characters. Use letters, numbers, and common punctuation only.'
   }
 
+  if (fieldName === 'projectDescription' || fieldName === 'requiredFeatures') {
+    const compact = trimmed.replace(/\s/g, '')
+    if (compact.length >= 20 && /^(.)\1{14,}$/.test(compact)) {
+      return 'Please enter meaningful project details, not repeated characters.'
+    }
+    if (
+      compact.length >= 30 &&
+      /[a-z]/i.test(compact) &&
+      !/[aeiou]/i.test(compact)
+    ) {
+      return 'Please enter valid project details in plain language.'
+    }
+  }
+
   return null
+}
+
+export function getFirstFormError(errors) {
+  const order = [
+    'clientName',
+    'companyName',
+    'projectTitle',
+    'projectDescription',
+    'requiredFeatures',
+    'budgetRange',
+    'timeline',
+    'platformType',
+  ]
+  for (const field of order) {
+    if (errors[field]) return errors[field]
+  }
+  return 'Please fix the errors in the form before generating.'
 }
 
 export function validateProposalForm(formData) {

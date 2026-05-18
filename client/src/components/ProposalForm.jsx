@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { validateProposalForm } from '../utils/inputValidation'
+import React, { useState, useRef } from 'react'
+import toast from 'react-hot-toast'
+import { getFirstFormError, validateProposalForm } from '../utils/inputValidation'
 
 function ProposalForm({ onSubmit, loading }) {
   const [formData, setFormData] = useState({
@@ -14,11 +15,31 @@ function ProposalForm({ onSubmit, loading }) {
   })
 
   const [errors, setErrors] = useState({})
+  const formRef = useRef(null)
 
   const validateForm = () => {
     const { valid, errors: newErrors } = validateProposalForm(formData)
     setErrors(newErrors)
-    return valid
+    return { valid, errors: newErrors }
+  }
+
+  const scrollToFirstError = (newErrors) => {
+    const firstField = [
+      'clientName',
+      'companyName',
+      'projectTitle',
+      'projectDescription',
+      'requiredFeatures',
+      'budgetRange',
+      'timeline',
+      'platformType',
+    ].find((field) => newErrors[field])
+
+    if (firstField) {
+      const el = formRef.current?.querySelector(`[name="${firstField}"]`)
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      el?.focus()
+    }
   }
 
   const handleChange = (e) => {
@@ -38,13 +59,34 @@ function ProposalForm({ onSubmit, loading }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (validateForm()) {
-      onSubmit(formData)
+    const { valid, errors: newErrors } = validateForm()
+
+    if (!valid) {
+      const message = getFirstFormError(newErrors)
+      toast.error(message, {
+        duration: 5000,
+        icon: '⚠️',
+      })
+      scrollToFirstError(newErrors)
+      return
     }
+
+    onSubmit(formData)
   }
 
+  const hasErrors = Object.keys(errors).length > 0
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+      {hasErrors && (
+        <div
+          role="alert"
+          className="p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-300 text-sm flex gap-2"
+        >
+          <span className="text-lg flex-shrink-0">⚠️</span>
+          <p>{getFirstFormError(errors)}</p>
+        </div>
+      )}
       {/* Client Name */}
       <div>
         <label htmlFor="clientName" className="block text-sm font-semibold text-gray-300 mb-2">

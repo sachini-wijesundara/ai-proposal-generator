@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Toaster } from 'react-hot-toast'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -30,6 +31,7 @@ function App() {
 
   return (
     <Router>
+      <Toaster position="top-center" toastOptions={{ duration: 5000 }} />
       <Routes>
         <Route
           path="/login"

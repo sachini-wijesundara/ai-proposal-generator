@@ -14,6 +14,7 @@ import { clearSession, getCurrentUser } from '../utils/auth'
 
 import { saveProposal } from '../utils/proposalStorage'
 import { getApiErrorMessage, getFetchErrorMessage, parseJsonResponse } from '../utils/apiClient'
+import { getFirstFormError, validateProposalForm } from '../utils/inputValidation'
 
 
 
@@ -34,17 +35,22 @@ function Dashboard() {
 
 
   const handleGenerateProposal = async (formData) => {
+    const { valid, errors: validationErrors } = validateProposalForm(formData)
+
+    if (!valid) {
+      const message = getFirstFormError(validationErrors)
+      setError(message)
+      setProposal(null)
+      toast.error(message, { duration: 5000, icon: '⚠️' })
+      return
+    }
 
     setLoading(true)
-
     setError(null)
-
     setProposal(null)
-
     setActiveTab('create')
 
     try {
-
       const response = await fetch('/api/proposal/generate-proposal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
