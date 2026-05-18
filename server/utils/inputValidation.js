@@ -32,6 +32,52 @@ const MALICIOUS_PATTERNS = [
 
 const SHORT_TEXT_PATTERN = /^[a-zA-Z0-9\s.'\-&,()]+$/
 
+const KEYBOARD_GIBBERISH_PATTERNS = [
+  /asdf/i, /qwert/i, /zxcv/i, /hjkl/i, /sdfgh/i, /fghjk/i, /jklq/i, /qwer/i, /yuio/i,
+]
+
+function isWordLike(token) {
+  const clean = token.replace(/[^a-zA-Z]/g, '')
+  if (clean.length < 3) return true
+  if (clean.length <= 4 && clean === clean.toUpperCase()) return true
+  return /[aeiou]/i.test(clean)
+}
+
+function validateMeaningfulLongText(value, { minWords, label }) {
+  const trimmed = value.trim()
+  for (const pattern of KEYBOARD_GIBBERISH_PATTERNS) {
+    if (pattern.test(trimmed)) {
+      return `Please enter real ${label}, not random keyboard text.`
+    }
+  }
+  const words = trimmed.split(/[\s,;]+/).map((w) => w.trim()).filter(Boolean)
+  if (words.length < minWords) {
+    return `${label} must include at least ${minWords} real words describing the project.`
+  }
+  const substantial = words.filter((w) => w.replace(/[^a-zA-Z]/g, '').length >= 3)
+  if (substantial.length < Math.max(2, minWords - 1)) {
+    return `Please use clear sentences for ${label.toLowerCase()}, not random characters.`
+  }
+  const readableWords = substantial.filter(isWordLike).length
+  if (readableWords / substantial.length < 0.7) {
+    return `Please enter meaningful ${label.toLowerCase()} in plain language, not gibberish.`
+  }
+  const compact = trimmed.replace(/\s/g, '')
+  if (/[bcdfghjklmnpqrstvwxyz]{6,}/i.test(compact)) {
+    return `Please enter readable ${label.toLowerCase()}, not random letters.`
+  }
+  const compactLower = compact.toLowerCase()
+  const uniqueRatio = new Set(compactLower).size / compactLower.length
+  if (compactLower.length >= 40 && uniqueRatio > 0.82 && words.length < 10) {
+    return `Please enter real ${label.toLowerCase()}, not random text.`
+  }
+  const letterCount = (trimmed.match(/[a-zA-Z]/g) || []).length
+  if (letterCount / trimmed.length < 0.65) {
+    return `${label} must use mostly letters and normal punctuation.`
+  }
+  return null
+}
+
 function checkMalicious(value) {
   if (!value || typeof value !== 'string') return null
   for (const { pattern, message } of MALICIOUS_PATTERNS) {
@@ -82,6 +128,21 @@ export function validateField(fieldName, value, { required = false, minLength = 
 
   if (shortText && !SHORT_TEXT_PATTERN.test(trimmed)) {
     return 'Contains invalid characters. Use letters, numbers, and common punctuation only.'
+  }
+
+  if (fieldName === 'projectDescription' || fieldName === 'requiredFeatures') {
+    const compact = trimmed.replace(/\s/g, '')
+    if (compact.length >= 20 && /^(.)\1{14,}$/.test(compact)) {
+      return 'Please enter meaningful project details, not repeated characters.'
+    }
+    if (compact.length >= 30 && /[a-z]/i.test(compact) && !/[aeiou]/i.test(compact)) {
+      return 'Please enter valid project details in plain language.'
+    }
+    const meaningfulError = validateMeaningfulLongText(trimmed, {
+      minWords: fieldName === 'projectDescription' ? 6 : 3,
+      label: fieldName === 'projectDescription' ? 'Project description' : 'Required features',
+    })
+    if (meaningfulError) return meaningfulError
   }
 
   return null
