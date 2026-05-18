@@ -13,6 +13,7 @@ import SavedProposals from '../components/SavedProposals'
 import { clearSession, getCurrentUser } from '../utils/auth'
 
 import { saveProposal } from '../utils/proposalStorage'
+import { getApiErrorMessage, getFetchErrorMessage, parseJsonResponse } from '../utils/apiClient'
 
 
 
@@ -45,44 +46,35 @@ function Dashboard() {
     try {
 
       const response = await fetch('/api/proposal/generate-proposal', {
-
         method: 'POST',
-
         headers: { 'Content-Type': 'application/json' },
-
         body: JSON.stringify(formData),
-
       })
 
-
+      const data = await parseJsonResponse(response)
 
       if (!response.ok) {
-
-        const errorData = await response.json()
-
-        const detailMsg = errorData.details
-
-          ? Object.values(errorData.details).join('. ')
-
-          : null
-
-        throw new Error(detailMsg || errorData.message || errorData.error || 'Failed to generate proposal')
-
+        if (!data) {
+          throw new Error(
+            response.status === 502 || response.status === 504
+              ? 'Backend server is not running. From the project folder run: bash ios.sh'
+              : 'Server returned an empty error. Check that the backend is running on port 5001 and .env has a valid API key.'
+          )
+        }
+        throw new Error(getApiErrorMessage(response, data))
       }
 
-
-
-      const data = await response.json()
+      if (!data) {
+        throw new Error(
+          'Server returned an empty response. Restart with bash ios.sh and confirm ANTHROPIC_API_KEY is set in .env.'
+        )
+      }
 
       setProposal({ ...data, formData })
-
       setError(null)
-
     } catch (err) {
-
       console.error('Error:', err)
-
-      setError(err.message || 'Error generating proposal. Please check your input and try again.')
+      setError(getFetchErrorMessage(err))
 
       setProposal(null)
 
