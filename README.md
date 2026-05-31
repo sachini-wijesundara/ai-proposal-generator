@@ -90,6 +90,24 @@ npm run dev
 
 The application will be available at `http://localhost:5173` (Vite default port).
 
+Or start both servers with one command:
+
+```bash
+bash ios.sh
+```
+
+## Deploy to Vercel (frontend + backend)
+
+The project includes a Vercel serverless API (`api/index.js`) so proposal generation works on your live URL.
+
+1. In [Vercel Dashboard](https://vercel.com) → your project → **Settings → General**
+2. Set **Root Directory** to `.` (project root, **not** `client`)
+3. Go to **Settings → Environment Variables** and add:
+   - `ANTHROPIC_API_KEY` = your Anthropic or OpenRouter key
+4. Redeploy the project
+
+After deploy, test: `https://your-app.vercel.app/api/health` should return JSON with `"apiKeyConfigured": true`.
+
 ## Features
 
 - **Client Details Input:** Staff enter project and client information

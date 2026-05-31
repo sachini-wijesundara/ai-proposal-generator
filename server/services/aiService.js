@@ -101,7 +101,9 @@ const callOpenRouter = async (apiKey, systemPrompt, userPrompt) => {
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': 'http://localhost:5173',
+      'HTTP-Referer': process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'http://localhost:5173',
       'X-Title': 'AI Proposal Generator',
     },
     body: JSON.stringify({

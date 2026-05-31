@@ -1,0 +1,9 @@
+{
+  "name": "ai-proposal-generator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run build --prefix client",
+    "dev": "bash ios.sh"
+  }
+}
