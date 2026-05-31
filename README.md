@@ -98,15 +98,15 @@ bash ios.sh
 
 ## Deploy to Vercel (frontend + backend)
 
-The project includes a Vercel serverless API (`api/index.js`) so proposal generation works on your live URL.
+Vercel is configured to deploy from the **`client`** folder (default). The API lives in `client/api/` and the backend in `client/server/`.
 
-1. In [Vercel Dashboard](https://vercel.com) → your project → **Settings → General**
-2. Set **Root Directory** to `.` (project root, **not** `client`)
-3. Go to **Settings → Environment Variables** and add:
-   - `ANTHROPIC_API_KEY` = your Anthropic or OpenRouter key
-4. Redeploy the project
+1. In Vercel → **ai-proposal-generator-m6zw** → **Settings** → **Environment Variables**
+2. Add `ANTHROPIC_API_KEY` = your API key (Production + Preview)
+3. Push to GitHub — Vercel redeploys automatically
 
-After deploy, test: `https://your-app.vercel.app/api/health` should return JSON with `"apiKeyConfigured": true`.
+Test after deploy: `https://ai-proposal-generator-m6zw.vercel.app/api/health`
+
+No need to change Root Directory if it is already set to **`client`**.
 
 ## Features
 

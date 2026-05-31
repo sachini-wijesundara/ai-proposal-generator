@@ -58,17 +58,17 @@ for %%p in (5001 5173 5174 5175) do (
 )
 
 REM --- Install dependencies if needed ---
-if not exist server\node_modules (
+if not exist client\server\node_modules (
   echo Installing server packages... this may take a minute.
-  cd server
+  cd client\server
   call npm install
   if errorlevel 1 (
-    echo [ERROR] npm install failed in server folder.
-    cd ..
+    echo [ERROR] npm install failed in client\server folder.
+    cd ..\..
     pause
     exit /b 1
   )
-  cd ..
+  cd ..\..
 )
 
 if not exist client\node_modules (
@@ -87,7 +87,7 @@ if not exist client\node_modules (
 REM --- Start backend + frontend in separate windows ---
 echo.
 echo Starting backend  (port 5001)...
-start "ProposalAI - Backend" cmd /k "cd /d "%~dp0server" && echo Backend running on http://localhost:5001 && node index.js"
+start "ProposalAI - Backend" cmd /k "cd /d "%~dp0client\server" && echo Backend running on http://localhost:5001 && node index.js"
 
 echo Waiting for backend...
 timeout /t 4 /nobreak >nul

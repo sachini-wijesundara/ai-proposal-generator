@@ -40,9 +40,9 @@ done
 sleep 1
 
 # Install dependencies if missing
-if [ ! -d server/node_modules ]; then
+if [ ! -d client/server/node_modules ]; then
   echo "Installing server dependencies..."
-  (cd server && npm install)
+  (cd client/server && npm install)
 fi
 if [ ! -d client/node_modules ]; then
   echo "Installing client dependencies..."
@@ -50,11 +50,11 @@ if [ ! -d client/node_modules ]; then
 fi
 
 # Fix execute permission on local binaries (macOS sometimes blocks them)
-chmod +x server/node_modules/.bin/* 2>/dev/null || true
+chmod +x client/server/node_modules/.bin/* 2>/dev/null || true
 chmod +x client/node_modules/.bin/* 2>/dev/null || true
 
 echo "Starting backend on port 5001..."
-(cd server && node index.js) &
+(cd client/server && node index.js) &
 SERVER_PID=$!
 
 sleep 3

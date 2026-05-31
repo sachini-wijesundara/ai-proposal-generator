@@ -21,8 +21,8 @@ if exist ".env.txt" (
   echo   Rename .env.txt to .env  ^(no .txt^)
 )
 
-if exist "server\.env" (
-  echo [WARNING] Found server\.env — key should be in ROOT .env
+if exist "client\server\.env" (
+  echo [WARNING] Found client\server\.env — key should be in ROOT .env
   echo   Copy content to: %CD%\.env
 )
 
@@ -52,7 +52,7 @@ if errorlevel 1 (
 echo ==========================================
 echo   .env must be HERE:
 echo   %CD%\.env
-echo   NOT in server\ or client\
+echo   NOT in client\server\ or client\
 echo ==========================================
 echo.
 pause
