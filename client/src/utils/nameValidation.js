@@ -29,7 +29,23 @@ const BLOCKED_NAMES = new Set([
   'spam',
   'bot',
   'demo',
+  'temp',
+  'tmp',
+  'trash',
+  'random',
+  'person',
+  'account',
 ])
+
+const BLOCKED_NAME_PHRASES = [
+  'test user',
+  'fake user',
+  'dummy user',
+  'test account',
+  'fake name',
+  'random user',
+  'sample user',
+]
 
 export const validateFullName = (name) => {
   const trimmed = (name || '').trim().replace(/\s+/g, ' ')
@@ -62,6 +78,13 @@ export const validateFullName = (name) => {
   }
 
   const lower = trimmed.toLowerCase()
+
+  if (BLOCKED_NAME_PHRASES.includes(lower)) {
+    return {
+      valid: false,
+      message: 'Please enter your real full name, not a test or placeholder',
+    }
+  }
 
   if (BLOCKED_NAMES.has(lower)) {
     return {

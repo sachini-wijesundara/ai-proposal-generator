@@ -28,9 +28,23 @@ if not exist .env (
   )
 )
 
+if exist ".env.txt" (
+  echo [ERROR] File is named .env.txt — rename to .env only ^(no .txt^)
+  echo   In File Explorer: View -^> Show -^> File name extensions
+  pause
+  exit /b 1
+)
+
 findstr /C:"your-api-key-here" .env >nul 2>&1
 if %errorlevel%==0 (
   echo [WARNING] .env still has placeholder key. Edit .env before generating proposals.
+  echo.
+)
+
+findstr /I "ANTHROPIC_API_KEY=sk-" .env >nul 2>&1
+if %errorlevel%==1 (
+  echo [WARNING] ANTHROPIC_API_KEY should start with sk-or- or sk-ant-
+  echo   Open .env in Notepad and fix the key line.
   echo.
 )
 

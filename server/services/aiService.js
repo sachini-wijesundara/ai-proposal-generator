@@ -1,14 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const apiKey = process.env.ANTHROPIC_API_KEY
-const isOpenRouter = apiKey?.startsWith('sk-or-')
-
-const anthropicClient = isOpenRouter
-  ? null
-  : new Anthropic({ apiKey })
-
 const ANTHROPIC_MODEL = 'claude-haiku-4-5-20251001'
 const OPENROUTER_MODEL = 'anthropic/claude-haiku-4.5'
+
+const getApiKey = () => (process.env.ANTHROPIC_API_KEY || '').trim()
 
 const buildPrompts = (clientDetails) => {
   const {
@@ -100,7 +95,7 @@ const parseProposalJson = (responseText, meta) => {
   }
 }
 
-const callOpenRouter = async (systemPrompt, userPrompt) => {
+const callOpenRouter = async (apiKey, systemPrompt, userPrompt) => {
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -131,8 +126,9 @@ const callOpenRouter = async (systemPrompt, userPrompt) => {
   return text.trim()
 }
 
-const callAnthropic = async (systemPrompt, userPrompt) => {
-  const message = await anthropicClient.messages.create({
+const callAnthropic = async (apiKey, systemPrompt, userPrompt) => {
+  const client = new Anthropic({ apiKey })
+  const message = await client.messages.create({
     model: ANTHROPIC_MODEL,
     max_tokens: 2000,
     system: systemPrompt,
@@ -145,16 +141,19 @@ const callAnthropic = async (systemPrompt, userPrompt) => {
 }
 
 export const generateProposalContent = async (clientDetails) => {
+  const apiKey = getApiKey()
+
   if (!apiKey || apiKey.includes('your-api-key')) {
     throw new Error('API key not configured. Add ANTHROPIC_API_KEY to your .env file.')
   }
 
+  const isOpenRouter = apiKey.startsWith('sk-or-')
   const prompts = buildPrompts(clientDetails)
 
   try {
     const responseText = isOpenRouter
-      ? await callOpenRouter(prompts.systemPrompt, prompts.userPrompt)
-      : await callAnthropic(prompts.systemPrompt, prompts.userPrompt)
+      ? await callOpenRouter(apiKey, prompts.systemPrompt, prompts.userPrompt)
+      : await callAnthropic(apiKey, prompts.systemPrompt, prompts.userPrompt)
 
     return parseProposalJson(responseText, prompts)
   } catch (error) {
